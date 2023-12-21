@@ -1,0 +1,693 @@
+! inlist to evolve a X solar mass star
+
+&star_job
+
+  ! begin with a pre-main sequence model
+    create_pre_main_sequence_model = .false.
+
+  ! save a model at the end of the run
+    save_model_when_terminate = .true.
+    save_model_filename = '18d0_4d0_400d0_biyfinal_model.mod'
+
+    load_saved_model = .true.
+    read_extra_star_job_inlist1 = .true.
+    extra_star_job_inlist1_name = 'star_job_extra' ! saved_model_name is in there
+
+    new_rotation_flag = .true.
+    change_rotation_flag = .true.
+    set_initial_surface_rotation_v = .true.
+    new_surface_rotation_v = 0 ! default value 0
+
+    ! change_net = .true.
+    ! new_net_name = 'approx21.net'
+
+    pgstar_flag = .true.
+    set_initial_model_number = .true.
+    initial_model_number = 0 
+
+    ! ~~~~~~~~~ NEW MESA THINGY ~~~~~~~~~
+    eosDT_cache_dir = 'mesa_cache/eosDT_cache'
+    eosPT_cache_dir = 'mesa_cache/eosPT_cache'
+    eosDE_cache_dir = 'mesa_cache/eosDE_cache'
+    ionization_cache_dir = 'mesa_cache/ionization_cache'
+    kap_cache_dir = 'mesa_cache/kap_cache'
+    rates_cache_dir = 'mesa_cache/rates_cache'
+
+
+    ! display on-screen plots
+    ! pgstar_flag = .true.
+
+/ !end of star_job namelist
+
+
+&controls
+
+    ! ~~~~~~~~~ FINISHING CONDS ~~~~~~~~~
+    xa_central_lower_limit_species(1) = 'he4'
+    xa_central_lower_limit(1) = 1d-8
+    envelope_mass_limit = 0.3
+    !max_model_number = 15000
+    max_model_number = 4500
+    
+    ! ~~~~~~~~~ STARTING SPECS ~~~~~~~~~
+    ! initial_mass = 25.0 ! in Msun units
+    ! initial_z = 0.004d0
+
+    report_hydro_solver_progress = .true.
+
+    ! ~~~~~~~~~ STRUCTURE EQUATIONS ~~~~~~~~~
+    use_dedt_form_of_energy_eqn = .true.
+    ! min_cell_energy_fraction_for_dedt_form = 0
+    !min_energy_for_dedt_form_of_energy_eqn = 1d13
+    use_eps_correction_for_KE_plus_PE_in_dLdm_eqn = .true.
+    use_eps_mdot = .true.
+
+    ! ~~~~~~~~~ EOS TABLES ~~~~~~~~~
+      use_eosDT2 = .true.   
+      use_eosELM = .true.
+
+    ! ~~~~~~~~~ STELLAR WINDS ~~~~~~~~~
+    use_other_wind = .true.
+
+    ! ~~~~~~~~~ METALLICITY ~~~~~~~~~
+    initial_z = 0.01d0
+    ! initial_z = 0.0067d0
+    !CO enhanced opacities
+    use_Type2_opacities = .true.
+    ! Zbase = 0.0067d0
+    Zbase = 0.01d0 ! solar value 0.014d0
+
+    ! ~~~~~~~~~ NUCLEAR BURNING ~~~~~~~~~
+    !split burning : is it needed?     
+    !op_split_burn = .true.
+    !op_split_burn_min_T = 2d8 ! carbon burning
+    !op_split_burn_eps = 1d-7
+    !op_split_burn_odescal = 1d-8
+
+     ! ~~~~~~~~~ OUTPUT ~~~~~~~~~
+    extra_terminal_output_file = 'log' 
+    photo_directory = 'photos'
+    log_directory = 'LOGS/AT2021biy/18d0_4d0_400d0'
+    profile_interval = 10 ! intial value 50
+    history_interval = 1
+    terminal_interval = 1
+    write_header_frequency = 10
+    max_num_profile_models = 2000
+    num_trace_history_values = 2
+    trace_history_value_name(1) = 'rel_E_err'
+    trace_history_value_name(2) = 'log_rel_run_E_err'
+
+
+    ! ~~~~~~~~~ CONVECTION ~~~~~~~~~     
+    read_extra_controls_inlist1 = .true.
+    extra_controls_inlist1_name = "inlist_semiconvection"  
+    read_extra_controls_inlist3 = .true.
+    extra_controls_inlist3_name = "inlist_convection"  
+      
+    ! ~~~~~~~~~ OVERSHOOTING ~~~~~~~~~
+    read_extra_controls_inlist4 = .true.
+    extra_controls_inlist4_name = "inlist_overshooting"  
+        
+    ! ~~~~~~~~~ ROTATIONAL MIXING ~~~~~~~~~
+    am_nu_ST_factor = 1.0
+    D_visc_factor = 0.0
+    am_nu_SH_factor = 0.0
+    D_ST_factor = 0.0
+    D_SH_factor = 0.0
+    D_GSF_factor = 1.0
+    D_ES_factor = 1.0
+    D_SSI_factor = 1.0
+    D_DSI_factor = 0.0
+    am_D_mix_factor = 0.033d0
+    am_gradmu_factor = 0.05d0
+    max_mdot_jump_for_rotation = 1.1 !default 2
+
+    
+      ! ~~~~~~~~~ ADJUST MASS LOSS ~~~~~~~~~
+    !max_logT_for_k_below_const_q = 100
+    !max_q_for_k_below_const_q = 0.995
+    !min_q_for_k_below_const_q = 0.995
+    !max_logT_for_k_const_mass = 100
+    !max_q_for_k_const_mass = 0.99
+    !min_q_for_k_const_mass = 0.99
+    !fix_eps_grav_transition_to_grid = .true.
+    !surf_avg_tau_min = 0
+    !surf_avg_tau = 10
+    ! max_mdot_redo_cnt is set to 100 together with rlof
+    !max_mdot_redo_cnt = 0
+    !min_years_dt_for_redo_mdot = 0
+    !surf_w_div_w_crit_limit = 0.98d0
+    !surf_w_div_w_crit_tol = 0.02d0
+    !rotational_mdot_boost_fac = 1d10
+    !rotational_mdot_kh_fac = 1d10
+    !mdot_revise_factor = 1.2
+    !implicit_mdot_boost = 0.1
+
+    ! ~~~~~~~~~ SOLVER ~~~~~~~~~
+    report_all_dt_limits = .true.
+    report_hydro_dt_info = .true.
+    report_why_dt_limits = .true.
+    report_why_dt_limits = .true.
+    timestep_factor_for_retries =  0.5 !  0.8
+    timestep_factor_for_backups = 0.5 !  0.8
+    min_timestep_factor = 0.8 !0.9 
+    max_timestep_factor = 1.3  ! 1.05d0
+    backup_hold = 10
+    retry_hold = 5  ! default 1
+    redo_limit = 100 !  -1
+    use_gold_tolerances = .true.
+
+    ! ~~~~~~~~~ MESHING ~~~~~~~~~
+    read_extra_controls_inlist2 = .true.
+    extra_controls_inlist2_name = "inlist_mesh"  
+
+
+    ! ~~~~~~~~~ WILL IT HELP WITH EDD? ~~~~~~~~~
+    max_logT_for_k_below_const_q = 100 ! default 5
+    max_q_for_k_below_const_q = 0.995  ! default 1.0
+    min_q_for_k_below_const_q = 0.995! default 0.999d0
+    max_logT_for_k_const_mass = 100 ! default 6
+    max_q_for_k_const_mass = 0.99 ! default 1.0
+    min_q_for_k_const_mass = 0.99 ! default 0.995
+    fix_eps_grav_transition_to_grid = .true.
+
+    ! ~~~~~~~~~ TIMESTEP ~~~~~~~~~
+    varcontrol_target = 1d-4 ! initial value 1d-4
+    !these are for changes in mdot, to avoid violent increase in mass transfer rate
+    delta_lg_star_mass_limit = 1d-4 ! default: 5d-3
+    delta_lg_star_mass_hard_limit = 1d-3 ! default:-1 
+    ! these are to properly resolve core hydrogen depletion
+    delta_lg_XH_cntr_max = 0.0d0 ! default: -3 
+    delta_lg_XH_cntr_min = -7.0d0 ! default: -6
+    !these are to properly resolve core helium depletion
+    delta_lg_XHe_cntr_max = 0.0d0 ! default: -3
+    delta_lg_XHe_cntr_min = -4.0d0 ! default:-3 
+    !avoid large jumps in the HR diagram
+    delta_HR_limit = 0.0005d0
+    delta_HR_hard_limit = 0.005d0
+    ! dHe_div_He_limit_min_He = 1d-3
+    ! dX_nuc_drop_limit = 5d-2
+    dH_decreases_only = .false.
+    ! `dH_div_H` here is `abs(xa(h1,k) - xa_old(h1,k))/xa(h1,k)`
+    ! If max `dH_div_H` is greater than this, reduce the next timestep by `dH_limit/max_dH`.
+    dH_div_H_limit = 0.2d0 ! default: 0.5
+    dH_div_H_limit_min_H = 1d-4 ! default 1d-3
+    dHe_decreases_only = .false.
+    dHe_div_He_limit = 0.2d0 ! default: 0.5
+
+/ ! end of controls namelist
+
+
+&pgstar
+       ! pause = .true.
+      !pgstar_show_log_age_in_years = .true.      
+      pgstar_show_age_in_years = .true. 
+      ! if true, the code waits for user to enter a RETURN on the command line
+                 
+         !file_white_on_black_flag = .false.
+         !win_white_on_black_flag = .false.
+         Grid2_win_flag = .true.
+         Grid2_num_cols = 16 ! divide plotting region into this many equal width cols
+         Grid2_num_plots = 10
+         Grid2_num_rows = 12 
+         !Grid2_win_width = 24
+         Grid2_win_width = 18
+         Grid2_win_aspect_ratio = 0.55 ! aspect_ratio = height/width
+         Grid2_xleft = 0.04 ! fraction of full window width for margin on left
+         Grid2_xright = 0.96 ! fraction of full window width for margin on right
+         Grid2_ybot = 0.02 ! fraction of full window width for margin on bottom
+         Grid2_ytop = 0.95 ! fraction of full window width for margin on top
+         
+         Grid2_file_flag = .true.
+         Grid2_file_dir = 'png/18d0_4d0_400d0'
+         Grid2_file_prefix = 'Grid2'
+         Grid2_file_interval = 10 
+
+         Grid2_file_width = 21
+ 
+         Grid2_file_aspect_ratio = 0.6
+
+
+
+        Grid2_plot_name(1) = 'TRho_Profile'
+        Grid2_plot_row(1) = 1 
+        Grid2_plot_rowspan(1) = 5
+        Grid2_plot_col(1) = 1 
+        Grid2_plot_colspan(1) = 3 
+        Grid2_plot_pad_left(1) = 0.02
+        Grid2_plot_pad_right(1) = 0.0
+        Grid2_plot_pad_top(1) = 0.0
+        Grid2_plot_pad_bot(1) = 0.15
+        Grid2_txt_scale_factor(1) = 0.5 
+        show_TRho_Profile_legend = .true.        
+        !show_TRho_Profile_eos_regions = .true.=.false.
+
+ 
+         Grid2_plot_name(2) = 'HR'
+         Grid2_plot_row(2) = 9
+         Grid2_plot_rowspan(2) = 4
+         Grid2_plot_col(2) = 1
+         Grid2_plot_colspan(2) = 4
+         ! Grid2_plot_pad_left(2) = 0.03
+         ! Grid2_plot_pad_right(2) = 0.0
+         ! Grid2_plot_pad_top(2) = 0.0
+         ! Grid2_plot_pad_bot(2) = 0.15
+         Grid2_txt_scale_factor(2) = 0.5
+         HR_title = ''
+
+         Grid2_plot_pad_left(2) = 0.01
+         Grid2_plot_pad_right(2) = 0.03
+         Grid2_plot_pad_top(2) = 0.0
+         Grid2_plot_pad_bot(2) = 0.03
+         Grid2_txt_scale_factor(2) = 0.5
+
+
+         !Grid2_plot_name(3) = 'Profile_Panels1'
+         !Grid2_plot_row(3) = 1
+         !Grid2_plot_rowspan(3) =3 
+         !Grid2_plot_col(3) =8 
+         !Grid2_plot_colspan(3) = 3 
+         !Profile_Panels1_num_panels = 1
+         !Profile_Panels1_xaxis_name = 'mass'
+         !Profile_Panels1_yaxis_name(1) = 'omega'
+         !Profile_Panels1_other_yaxis_name(1) = ''
+         !Profile_Panels1_xmin = 0.0 ! only used if /= -101d0
+         
+         Grid2_plot_name(3) = 'History_Track1'
+         ! History_Panels2_num_panels = 1
+         ! History_Panels2_yaxis_name(1) = 'rl_overflow_1'
+         ! History_Panels2_other_yaxis_name(1) = 'rl_relative_overflow_1'
+         ! History_Panels2_xaxis_name = 'model_number'
+         ! History_Panels2_yaxis_reversed(:) = .false.
+         ! History_Panels2_yaxis_log(:) = .false.
+
+
+         History_Track1_xleft = 0.15
+        History_Track1_xright = 0.85
+        History_Track1_ybot = 0.15
+        History_Track1_ytop = 0.85
+        History_Track1_txt_scale = 1.0
+        History_Track1_title = ''
+        ! History_Track1_num_panels = 1
+
+        History_Track1_xname = 'model_number'
+        History_Track1_yname = 'log_L'
+        History_Track1_xaxis_label = 'model_number'
+        History_Track1_yaxis_label = 'log L/L\d\(2281)'
+        History_Track1_reverse_xaxis = .false.
+        History_Track1_reverse_yaxis = .false.
+        History_Track1_log_xaxis = .false.
+        History_Track1_log_yaxis = .false.
+
+         Grid2_plot_row(3) = 1
+         Grid2_plot_rowspan(3) =3
+         Grid2_plot_col(3) =5
+         Grid2_plot_colspan(3) = 4
+         ! Profile_Panels1_num_panels = 1
+         ! Profile_Panels1_xaxis_name = 'mass'
+         ! Profile_Panels1_yaxis_name(1) = 'omega'
+         ! Profile_Panels1_other_yaxis_name(1) = ''
+         ! Profile_Panels1_xmin = 0.0 ! only used if /= -101d0
+
+         Grid2_plot_pad_left(3) = 0.01
+         Grid2_plot_pad_right(3) = 0.03
+         Grid2_plot_pad_top(3) = 0.01
+         Grid2_plot_pad_bot(3) = 0.0
+         Grid2_txt_scale_factor(3) = 0.5
+         ! ! History_Panels2_ymin(:) = -15d0
+         ! ! History_Panels2_ymax(:) = 0d0
+         ! History_Panels2_ymargin(:) = 0.5
+         ! History_Panels2_dymin(:) = -1
+
+         ! History_Panels3_num_panels = 1
+         ! History_Panels3_yaxis_name(1) = 'rl_1'
+         ! History_Panels3_other_yaxis_name(1) = 'lg_mtransfer_rate'
+         ! History_Panels3_xaxis_name = 'model_number'
+         ! History_Panels3_yaxis_reversed(:) = .false.
+         ! History_Panels3_yaxis_log(:) = .false.
+         
+         ! !History_Panels3_ymin(:) = -15d0
+         ! !History_Panels3_ymax(:) = 0d0
+         ! History_Panels3_ymargin(:) = 0.5
+         ! History_Panels3_dymin(:) = -1
+
+        !  Summary_History_num_lines = 6
+        ! Summary_History_name(1) = 'log_LH'
+        ! Summary_History_legend(1) = 'log LH rel'
+        ! Summary_History_name(2) = 'log_LHe'
+        ! Summary_History_legend(2) = 'log LHe rel'
+        ! Summary_History_name(3) = 'log_L'
+        ! Summary_History_legend(3) = 'log L rel'
+        ! Summary_History_name(4) = 'log_Teff'
+        ! Summary_History_legend(4) = 'log Teff rel'
+        ! Summary_History_name(5) = 'log_R'
+        ! Summary_History_legend(5) = 'log R rel'
+        ! Summary_History_name(6) = 'lg_mtransfer_rate'
+        ! Summary_History_legend(6) = 'lg_mtransfer_rate rel'
+        ! Summary_History_scaled_value(6) = .false.
+        ! Summary_History_name(7) = 'center_he4'
+        ! Summary_History_legend(7) = 'he4\dc\u'
+        ! Summary_History_scaled_value(7) = .false.
+
+
+
+         show_TRho_annotation1 = .true.
+         show_TRho_annotation2 = .true.
+         show_TRho_annotation3 = .true.
+         show_TRho_degeneracy_line = .true.
+
+
+         Grid2_plot_name(4) = 'Text_Summary1'
+         Grid2_plot_row(4) =11 
+         Grid2_plot_rowspan(4) = 2
+         Grid2_plot_col(4) = 1
+         Grid2_plot_colspan(4) = 16 
+         
+         Grid2_plot_pad_left(4) = -0.02
+         Grid2_plot_pad_right(4) =-0.02
+         Grid2_plot_pad_top(4) = 0.07
+         Grid2_plot_pad_bot(4) = 0.0
+         Grid2_txt_scale_factor(4) = 0.12 
+         Text_Summary1_num_rows = 6 
+         Text_Summary1_num_cols = 6
+         Text_Summary1_name(:,:) = ''
+
+
+        Text_Summary1_name(1,1) = ''
+        Text_Summary1_name(2,1) = ''
+        Text_Summary1_name(3,1) = ''
+        Text_Summary1_name(4,1) = ''
+        Text_Summary1_name(5,1) = ''
+        Text_Summary1_name(6,1) = ''
+
+        Text_Summary1_name(1,5) = 'model_number'
+        Text_Summary1_name(2,5) = 'log_star_age'
+        Text_Summary1_name(3,5) = 'log_dt'
+        Text_Summary1_name(4,5) = 'num_zones'
+        Text_Summary1_name(5,5) = 'num_retries'
+        Text_Summary1_name(6,5) = 'num_backups'
+
+
+        
+        Text_Summary1_name(1,4) = 'star_mass'
+        Text_Summary1_name(2,4) = 'c_core_mass'
+        Text_Summary1_name(3,4) = 'log_L'
+        Text_Summary1_name(4,4) = 'log_Teff'
+        Text_Summary1_name(5,4) = 'log_R'
+        Text_Summary1_name(6,4) = 'lg_mtransfer_rate'
+
+        Text_Summary1_name(1,2) = ''
+        Text_Summary1_name(2,2) = ''
+        Text_Summary1_name(3,2) = ''
+        Text_Summary1_name(4,2) = ''
+        Text_Summary1_name(5,2) = ''
+        Text_Summary1_name(6,2) = ''
+
+        Text_Summary1_name(1,3) = ''
+        Text_Summary1_name(2,3) = ''
+        Text_Summary1_name(3,3) = ''
+        Text_Summary1_name(4,3) = ''
+        Text_Summary1_name(5,3) = ''
+        Text_Summary1_name(6,3) = ''
+
+        
+        Text_Summary1_name(1,6) = 'log_cntr_T'
+        Text_Summary1_name(2,6) = 'log_cntr_Rho'
+        Text_Summary1_name(3,6) = 'log_center_P'
+        Text_Summary1_name(4,6) = 'center he4'
+        Text_Summary1_name(5,6) = 'center c12'
+        Text_Summary1_name(6,6) = 'radius'
+
+        
+
+
+        !Text_Summary1_name(1,5) = 'nuc_time_k'
+        !Text_Summary1_name(2,5) = 'nuc_time_k2'
+        !Text_Summary1_name(3,5) = 'dyn_time_dens'
+        !Text_Summary1_name(4,5) = "eddy_time_k3"
+        !Text_Summary1_name(5,5) = "max_conv_vel_all"
+
+
+
+
+        Grid2_plot_name(5) = 'Profile_Panels3'
+        Grid2_plot_row(5) = 1
+        Grid2_plot_rowspan(5) = 11 
+        Grid2_plot_col(5) =8 
+        Grid2_plot_colspan(5) = 5
+        Grid2_plot_pad_left(5) = 0.07
+        Grid2_plot_pad_right(5) = 0.03
+        Grid2_plot_pad_top(5) = 0.0
+        Grid2_plot_pad_bot(5) = 0.05
+        Grid2_txt_scale_factor(5) = 0.4
+        Abundance_legend_txt_scale_factor = 1.0
+        Power_legend_txt_scale_factor = 1.0
+
+        Abundance_use_decorator = .false.
+        Abundance_legend_max_cnt = 0
+        !Abundance_xmin = -6
+        Abundance_log_mass_frac_min = -4 ! only used if < 0
+
+         Profile_Panels3_title = 'Outer-800-zones'
+         Profile_Panels3_num_panels = 4
+         Profile_Panels3_txt_scale = 1.0
+         Profile_Panels3_yaxis_name(1) = 'Mixing'
+         Profile_Panels3_yaxis_name(2) = 'logL'
+         Profile_Panels3_other_yaxis_name(2) = 'log_thermal_time_to_surface'
+         Profile_Panels3_yaxis_name(3) = 'dr_dt'
+         Profile_Panels3_yaxis_log(3) = .true.
+         Profile_Panels3_other_yaxis_name(3) = 'xr'
+         Profile_Panels3_yaxis_name(4) = 'log_opacity'
+         Profile_Panels3_other_yaxis_name(4) = 'log_abs_eps_grav_dm_div_L'
+         ! Profile_Panels3_other_yaxis_name(4) = 'log_Lrad'
+         
+
+         Profile_Panels3_ymin(2) = 2.6
+         Profile_Panels3_ymax(2) = 5.0
+         Profile_Panels3_xmax = 800
+
+
+         !History_Panels3_ymin(:) = -15d0
+         ! !History_Panels3_ymax(:) = 0d0
+         ! Profile_Panels3_other_yaxis_name(4) = 'logRho'
+         ! Profile_Panels3_yaxis_name(5) = 'log_L_div_Ledd'
+         ! Profile_Panels3_other_yaxis_name(5) = 'opacity'
+   
+         Profile_Panels3_xaxis_name = "zone"
+
+         Profile_Panels3_xaxis_reversed = .false.
+         Profile_Panels3_xmin = 0.0 ! only used if /= -101d0
+         !Profile_Panels3_xmax = 1.3d0
+         Power_use_decorator = .true.
+
+
+        
+        Grid2_plot_name(6) = 'Kipp'
+        Grid2_plot_row(6) = 5
+        Grid2_plot_rowspan(6) = 5
+        Grid2_plot_col(6) = 0 
+        Grid2_plot_colspan(6) = 4
+        Grid2_plot_pad_left(6) = 0.08
+        Grid2_plot_pad_right(6) = 0.0
+        Grid1_plot_pad_top(6) = 0.0
+        Grid2_plot_pad_bot(6) = 0.15
+        Grid2_txt_scale_factor(6) = 0.5
+
+
+
+        Grid2_plot_name(7) = 'History_Panels1'
+         History_Panels1_num_panels = 2
+         History_Panels1_yaxis_name(1) = 'rl_overflow_1'
+         History_Panels1_other_yaxis_name(1) = 'rl_relative_overflow_1'
+         History_Panels1_yaxis_name(2) = 'v_surf_km_s'
+         History_Panels1_other_yaxis_name(2) = 'lg_mtransfer_rate'
+         ! History_Panels1_yaxis_name(3) = 'log_L'
+         ! History_Panels1_other_yaxis_name(3) = 'log_abs_Lgrav'
+         ! History_Panels1_yaxis_name(4) = 'surf_avg_opacity'
+         ! History_Panels1_other_yaxis_name(4) = 'log_L'
+         History_Panels1_xaxis_name = 'model_number'
+         History_Panels1_yaxis_reversed(:) = .false.
+         History_Panels1_yaxis_log(:) = .false.
+         History_Panels1_title = ''
+         
+         !History_Panels1_ymin(:) = -15d0
+         !History_Panels1_ymax(:) = 0d0
+         History_Panels1_ymargin(:) = 0.5
+         History_Panels1_dymin(:) = -1
+
+         Grid2_plot_row(7) =1
+         Grid2_plot_rowspan(7) =6
+         Grid2_plot_col(7) = 14 
+         Grid2_plot_colspan(7) = 4 
+         Grid2_plot_pad_left(7) = 0.0
+         Grid2_plot_pad_right(7) = 0.06
+         Grid2_plot_pad_top(7) = 0.0
+         Grid2_plot_pad_bot(7) = 0.02
+         Grid2_txt_scale_factor(7) = 0.3
+
+
+        Grid2_plot_name(8) = 'Summary_Profile'
+        Summary_Profile_xaxis_name = 'zone'
+        Summary_Profile_xaxis_reversed = .false.
+        Grid2_plot_row(8) = 8
+        Grid2_plot_rowspan(8) = 5
+        Grid2_plot_col(8) = 13 
+        Grid2_plot_colspan(8) = 4
+        Grid2_plot_pad_left(8) = 0.04
+        Grid2_plot_pad_right(8) = 0.0
+        Grid2_plot_pad_top(8) = 0.0
+        Grid2_plot_pad_bot(8) = 0.15
+        Grid2_txt_scale_factor(8) = 0.5
+
+        ! Grid2_plot_name(9) = 'History_Panels4'
+        !  History_Panels4_num_panels = 2
+        !  History_Panels4_yaxis_name(1) = 'log_LH'
+        !  History_Panels4_other_yaxis_name(1) = 'lg_mtransfer_rate'
+        !  History_Panels4_xaxis_name = 'model_number'
+        !  History_Panels4_yaxis_reversed(:) = .false.
+        !  History_Panels4_yaxis_log(:) = .false.
+        !  History_Panels4_title = ''
+        !  History_Panels1_title = ''
+         
+        !  !History_Panels1_ymin(:) = -15d0
+        !  !History_Panels1_ymax(:) = 0d0
+        !  History_Panels4_ymargin(:) = 0.5
+        !  History_Panels4_dymin(:) = -1
+
+        !  Grid2_plot_row(9) =7
+        !  Grid2_plot_rowspan(9) =3 
+        !  Grid2_plot_col(9) = 5 
+        !  Grid2_plot_colspan(9) = 4 
+        !  Grid2_plot_pad_left(9) = 0.03
+        !  Grid2_plot_pad_right(9) = 0.04
+        !  Grid2_plot_pad_top(9) = 0.06
+        !  Grid2_plot_pad_bot(9) = 0.01
+        !  Grid2_txt_scale_factor(9) = 0.5
+
+
+Summary_Profile_num_lines = 7
+Summary_Profile_name(1) = 'log_opacity'
+Summary_Profile_legend(1) = 'log opacity rel'
+Summary_Profile_name(2) = 'logL'
+Summary_Profile_legend(2) = 'logL'
+Summary_Profile_name(3) = 'logT'
+Summary_Profile_legend(3) = 'logT rel'
+Summary_Profile_name(4) = 'entropy'
+Summary_Profile_legend(4) = 'entropy rel'
+Summary_Profile_name(5) = 'logR'
+Summary_Profile_legend(5) = 'logR rel'
+Summary_Profile_name(6) = 'logE'
+Summary_Profile_legend(6) = 'logE (internal)'
+Summary_Profile_name(7) = 'log_Lrad'
+Summary_Profile_legend(7) = 'log_Lrad'
+
+
+        Grid2_plot_name(9) = 'History_Track2'
+
+
+        History_Track2_xleft = 0.15
+        History_Track2_xright = 0.85
+        History_Track2_ybot = 0.15
+        History_Track2_ytop = 0.85
+        History_Track2_txt_scale = 1.0
+        History_Track2_title = ''
+        ! History_Track1_num_panels = 1
+
+        History_Track2_xname = 'model_number'
+        History_Track2_yname = 'rl_relative_overflow_1'
+        History_Track2_xaxis_label = 'model_number'
+        History_Track2_yaxis_label = 'relative RL overflow'
+        History_Track2_reverse_xaxis = .false.
+        History_Track2_reverse_yaxis = .false.
+        History_Track2_log_xaxis = .false.
+        History_Track2_log_yaxis = .false.
+
+        History_Track2_ymin = -0.3d0
+        History_Track2_ymax = 0.3d0
+
+
+         Grid2_plot_row(9) = 5
+         Grid2_plot_rowspan(9) =3
+         Grid2_plot_col(9) =5
+         Grid2_plot_colspan(9) = 4
+
+         Grid2_plot_pad_left(9) = 0.01
+         Grid2_plot_pad_right(9) = 0.03
+         Grid2_plot_pad_top(9) = 0.01
+         Grid2_plot_pad_bot(9) = 0.0
+         Grid2_txt_scale_factor(9) = 0.5
+
+         Grid2_plot_name(10) = 'History_Track3'
+
+
+        History_Track3_xleft = 0.15
+        History_Track3_xright = 0.85
+        History_Track3_ybot = 0.15
+        History_Track3_ytop = 0.85
+        History_Track3_txt_scale = 1.0
+        History_Track3_title = ''
+        ! History_Track1_num_panels = 1
+
+        History_Track3_xname = 'model_number'
+        History_Track3_yname = 'lg_mtransfer_rate'
+        History_Track3_xaxis_label = 'model_number'
+        History_Track3_yaxis_label = 'mass transfer rate'
+        History_Track3_reverse_xaxis = .false.
+        History_Track3_reverse_yaxis = .false.
+        History_Track3_log_xaxis = .false.
+        History_Track3_log_yaxis = .false.
+
+        ! History_Track5_xmin = -101d0
+        ! History_Track5_xmax = -101d0
+        History_Track3_ymin = -4d0
+        History_Track3_ymax = -1d0
+
+
+         Grid2_plot_row(10) = 9
+         Grid2_plot_rowspan(10) =3
+         Grid2_plot_col(10) =5
+         Grid2_plot_colspan(10) = 4
+
+         Grid2_plot_pad_left(10) = 0.02
+         Grid2_plot_pad_right(10) = 0.03
+         Grid2_plot_pad_top(10) = 0.01
+         Grid2_plot_pad_bot(10) = 0.0
+         Grid2_txt_scale_factor(10) = 0.5
+
+        !  Grid2_plot_name(11) = 'History_Track4'
+
+
+        !  History_Track1_xleft = 0.15
+        ! History_Track1_xright = 0.85
+        ! History_Track1_ybot = 0.15
+        ! History_Track1_ytop = 0.85
+        ! History_Track1_txt_scale = 1.0
+        ! History_Track1_title = ''
+        ! ! History_Track1_num_panels = 1
+
+        ! History_Track1_xname = 'model_number'
+        ! History_Track1_yname = 'log_L'
+        ! History_Track1_xaxis_label = 'model_number'
+        ! History_Track1_yaxis_label = 'log L/L\d\(2281)'
+        ! History_Track1_reverse_xaxis = .false.
+        ! History_Track1_reverse_yaxis = .false.
+        ! History_Track1_log_xaxis = .false.
+        ! History_Track1_log_yaxis = .false.
+
+
+        !  Grid2_plot_row(11) = 1
+        !  Grid2_plot_rowspan(11) =3
+        !  Grid2_plot_col(11) =5
+        !  Grid2_plot_colspan(11) = 4
+
+        !  Grid2_plot_pad_left(11) = 0.01
+        !  Grid2_plot_pad_right(11) = 0.03
+        !  Grid2_plot_pad_top(11) = 0.01
+        !  Grid2_plot_pad_bot(11) = 0.0
+        !  Grid2_txt_scale_factor(11) = 0.5
+
+
+
+      
+/ ! end of pgstar namelist
+

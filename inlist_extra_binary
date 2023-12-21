@@ -1,0 +1,5 @@
+&binary_controls
+m2 = 4d0
+initial_period_in_days = -1
+initial_separation_in_Rsuns = 400d0
+/ ! end of binary_controls namelist
