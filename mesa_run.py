@@ -2,6 +2,7 @@ import subprocess
 import numpy as np
 import os
 import time
+import multiprocessing
 
 
 def change_txt(file,init, m,r=None,s=None):
